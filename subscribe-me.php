@@ -7,6 +7,7 @@
 */
 
 //For Trial at admin site
+//For Trial at admin site
 function my_add_menu_pages()
 {
     add_menu_page(
@@ -14,12 +15,64 @@ function my_add_menu_pages()
         'Subscribe Me',
         'manage_options',
         'subscribe-me',
-        'subscribe_me_callback',
+        'subscribe_me_cb',
         'dashicons-email',
         10
     );
+    add_submenu_page(
+        'subscribe-me',
+        'Subscribers List',
+        'Subscribers',
+        'manage_options',
+        'subscribers',
+        'subscribers_cb',
+    );
 }
+
 add_action('admin_menu', 'my_add_menu_pages');
+
+function subscribe_me_cb()
+{
+?>
+    <div class="wrap">
+        <h2>Subscribe Me!</h2>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('my_plugin_settings_group');
+            do_settings_sections('subscribe-me-settings');
+            ?>
+            <?php submit_button('Save Changes'); ?>
+        </form>
+    </div>
+<?php
+}
+
+function reg_settings()
+{
+    register_setting('my_plugin_settings_group', 'no_of_posts');
+    add_settings_section('subs_settings', 'Subscription Mail Settings', '', 'subscribe-me-settings');
+    add_settings_field('no_of_posts', 'No of Posts', 'no_of_posts_cb', 'subscribe-me-settings', 'subs_settings');
+}
+add_action('admin_init', 'reg_settings');
+
+function no_of_posts_cb()
+{
+?>
+    <input type="text" name="no_of_posts" value="<?php echo esc_attr(get_option('no_of_posts')) ?>">
+<?php
+}
+
+
+//Submenu Subscribers List
+function subscribers_cb() {
+    $subscribers_list= get_option('subs_emails');
+    echo '<table><th>Subscribers Emails</th>';
+
+    foreach($subscribers_list as $mail) {
+        echo '<tr><td>'. $mail . '</tr></td>';
+    }
+}
+
 
 function subscribe_me_callback()
 {
@@ -102,25 +155,24 @@ function send_subscription_mail($to)
 
 function get_daily_post_summary()
 {
+    /*For sending latest n posts */
     $args = array(
-        'date_query' => array(
-            array(
-                'after' => '24 hours ago',
-            ),
-        ),
+        'post_type' => 'post',
+        'posts_per_page' => get_option('no_of_posts'),
+        'post_status' => 'publish'
     );
+
     $query = new WP_Query($args);
     $posts = $query->posts;
-    $summary = array();
+    $mail_list = array();
 
     foreach ($posts as $post) {
         $post_data = array(
             'title' => $post->post_title,
             'url' => get_permalink($post->ID),
         );
-        array_push($summary, $post_data);
+        array_push($mail_list, $post_data);
     }
-
-    return $summary;
+    return $mail_list;
 }
 ?>
