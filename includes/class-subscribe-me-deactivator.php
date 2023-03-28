@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://https://kushankur.wisdmlabs.net
+ * @link       https://kushankur.wisdmlabs.net
  * @since      1.0.0
  *
  * @package    Subscribe_Me
@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Subscribe_Me
  * @subpackage Subscribe_Me/includes
- * @author     Kushankur Das <daskushankur990@gmail.com>
+ * @author     Kushankur Das <kushankur.das@wisdmlabs.com>
  */
 class Subscribe_Me_Deactivator {
 

@@ -5,7 +5,7 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://https://kushankur.wisdmlabs.net
+ * @link       https://kushankur.wisdmlabs.net
  * @since      1.0.0
  *
  * @package    Subscribe_Me
