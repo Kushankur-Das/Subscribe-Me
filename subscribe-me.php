@@ -1,15 +1,85 @@
 <?php
-/*
-* Plugin Name: Subscribe Me
-* Author: Kushankur Das
-* Description: Posts summary on Admin Mail at EOD
-* Text Domain: subscribe-me
-*/
 
-//For Trial at admin site
-//For Trial at admin site
-//enqueue CSS
-require plugin_dir_path(__FILE__) . 'includes/scripts.php';
+/**
+ * The plugin bootstrap file
+ *
+ * This file is read by WordPress to generate the plugin information in the plugin
+ * admin area. This file also includes all of the dependencies used by the plugin,
+ * registers the activation and deactivation functions, and defines a function
+ * that starts the plugin.
+ *
+ * @link              https://https://kushankur.wisdmlabs.net
+ * @since             1.0.0
+ * @package           Subscribe_Me
+ *
+ * @wordpress-plugin
+ * Plugin Name:       Subscribe-Me
+ * Plugin URI:        https://subscribeme.in
+ * Description:       Posts summary on for subscribed users Admin Mail at EOD 
+ * Version:           1.0.0
+ * Author:            Kushankur Das
+ * Author URI:        https://https://kushankur.wisdmlabs.net
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       subscribe-me
+ * Domain Path:       /languages
+ */
+
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * Currently plugin version.
+ * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Rename this for your plugin and update it as you release new versions.
+ */
+define( 'SUBSCRIBE_ME_VERSION', '1.0.0' );
+
+/**
+ * The code that runs during plugin activation.
+ * This action is documented in includes/class-subscribe-me-activator.php
+ */
+function activate_subscribe_me() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-subscribe-me-activator.php';
+	Subscribe_Me_Activator::activate();
+}
+
+/**
+ * The code that runs during plugin deactivation.
+ * This action is documented in includes/class-subscribe-me-deactivator.php
+ */
+function deactivate_subscribe_me() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-subscribe-me-deactivator.php';
+	Subscribe_Me_Deactivator::deactivate();
+}
+
+register_activation_hook( __FILE__, 'activate_subscribe_me' );
+register_deactivation_hook( __FILE__, 'deactivate_subscribe_me' );
+
+/**
+ * The core plugin class that is used to define internationalization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-subscribe-me.php';
+
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    1.0.0
+ */
+function run_subscribe_me() {
+
+	$plugin = new Subscribe_Me();
+	$plugin->run();
+
+}
+run_subscribe_me();
 
 
 //For Trial at admin site
@@ -81,7 +151,7 @@ function subscribers_cb()
 ?>
 
     <form method="post">
-        <input type="submit" name="send" id="send" value="Send Mail" />
+        <input type="submit" name="send" id="send" value="Send Mail" class="button button-primary" />
     </form>
 
     <?php
@@ -108,7 +178,7 @@ function send_mail_to_all()
         }
 
         $headers = array(
-            'From: kushankur.das@wisdmlabs.com',
+            'From: nikhil.mhaske@wisdmlabs.com',
             'Content-Type: text/html; charset=UTF-8'
         );
 
@@ -168,11 +238,11 @@ function subscribe_me_callback()
     }
 }
 
-function subscribe_me_add_form()
-{
-    subscribe_me_callback();
-}
-add_action('wp_head', 'subscribe_me_add_form');
+// function subscribe_me_add_form()
+// {
+//     subscribe_me_callback();
+// }
+// add_action('wp_head', 'subscribe_me_add_form');
 
 function send_subscription_mail($to)
 {
@@ -189,7 +259,7 @@ function send_subscription_mail($to)
     }
 
     $headers = array(
-        'From: kushankur.das@wisdmlabs.com',
+        'From: nikhil.mhaske@wisdmlabs.com',
         'Content-Type: text/html; charset=UTF-8'
     );
 
@@ -198,6 +268,15 @@ function send_subscription_mail($to)
 
 function get_daily_post_summary()
 {
+    /*For sending posts in last 24 hours*/
+    // $args = array(
+    //     'date_query' => array(
+    //         array(
+    //             'after' => '24 hours ago',
+    //         ),
+    //     ),
+    // );
+
     /*For sending latest n posts */
     $args = array(
         'post_type' => 'post',
@@ -218,4 +297,44 @@ function get_daily_post_summary()
     }
     return $mail_list;
 }
+
+class Subscription_Widget extends WP_Widget
+{
+
+    // Constructor function
+    public function __construct()
+    {
+        $widget_options = array(
+            'classname' => 'subscription_widget',
+            'description' => 'A widget for subscribing to our newsletter'
+        );
+        parent::__construct('subscription_widget', 'Subscription Widget', $widget_options);
+    }
+
+    // Output the widget content on the front-end
+    public function widget($args, $instance)
+    {
+        // Code to output the widget HTML goes here
+        subscribe_me_callback();
+    }
+
+    // Output the widget form in the admin area
+    public function form($instance)
+    {
+        // Code to output the widget form HTML goes here
+    }
+
+    // Handle saving the widget options
+    public function update($new_instance, $old_instance)
+    {
+        // Code to handle saving the widget options goes here
+    }
+}
+
+function register_subscription_widget()
+{
+    register_widget('Subscription_Widget');
+}
+add_action('widgets_init', 'register_subscription_widget');
+
 ?>
